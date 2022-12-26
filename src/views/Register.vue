@@ -7,7 +7,7 @@
 
     <!-- Register -->
     <form
-      @submit.prevent="register"
+      @submit.prevent="register, createUser"
       class="p-8 flex flex-col bg-light-grey rounded-md shadow-lg"
     >
       <h1 class="text-3xl text-at-light-green mb-4">Register</h1>
@@ -68,6 +68,7 @@
 import { ref } from "vue";
 import { supabase } from "../supabase/init";
 import { useRouter } from "vue-router";
+import { uid } from "uid";
 
 export default {
   name: "register",
@@ -78,6 +79,7 @@ export default {
     const password = ref(null);
     const confirmPassword = ref(null);
     const errorMsg = ref(null);
+    const statusMsg = ref(null);
 
     // Register function
     const register = async () => {
@@ -103,7 +105,33 @@ export default {
       }, 5000);
     };
 
-    return { email, password, confirmPassword, errorMsg, register };
+    const createUser = async () => {
+      try {
+        const { error } = await supabase.from("profiles").insert([
+          {
+            id: uid(),
+            updated_at: new Date(),
+            email: email.value,
+            password: password.value,
+          },
+        ]);
+        if (error) throw error;
+        statusMsg.value = "Succes: Workout Created!";
+        //workoutName.value = null;
+        //workoutType.value = "select-workout";
+        //exercises.value = [];
+        setTimeout(() => {
+          statusMsg.value = false;
+        }, 5000);
+      } catch (error) {
+        errorMsg.value = `Error: ${error.message}`;
+        setTimeout(() => {
+          errorMsg.value = false;
+        }, 5000);
+      }
+    };
+
+    return { email, password, confirmPassword, errorMsg, register, createUser };
   },
 };
 </script>
