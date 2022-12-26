@@ -7,7 +7,7 @@
 
     <!-- Register -->
     <form
-      @submit.prevent="register, createUser"
+      @submit.prevent="register"
       class="p-8 flex flex-col bg-light-grey rounded-md shadow-lg"
     >
       <h1 class="text-3xl text-at-light-green mb-4">Register</h1>
@@ -20,6 +20,28 @@
           class="p-2 text-gray-500 focus:outline-none"
           id="email"
           v-model="email"
+        />
+      </div>
+
+      <div class="flex flex-col mb-2">
+        <label for="fullName" class="mb-1 text-sm text-at-light-green">Full Name</label>
+        <input
+          type="text"
+          required
+          class="p-2 text-gray-500 focus:outline-none"
+          id="fullName"
+          v-model="fullName"
+        />
+      </div>
+
+      <div class="flex flex-col mb-2">
+        <label for="licensePlate" class="mb-1 text-sm text-at-light-green">License plate</label>
+        <input
+          type="text"
+          required
+          class="p-2 text-gray-500 focus:outline-none"
+          id="licensePlate"
+          v-model="licensePlate"
         />
       </div>
 
@@ -68,7 +90,7 @@
 import { ref } from "vue";
 import { supabase } from "../supabase/init";
 import { useRouter } from "vue-router";
-import { uid } from "uid";
+//import { uid } from "uid";
 
 export default {
   name: "register",
@@ -78,8 +100,39 @@ export default {
     const email = ref(null);
     const password = ref(null);
     const confirmPassword = ref(null);
+    const fullName = ref(null);
+    const licensePlate = ref(null);
     const errorMsg = ref(null);
     const statusMsg = ref(null);
+
+    // const test = () => {
+    //   console.log("test")
+    // }
+
+    //insert data to users
+    const createUser = async () => {
+      try {
+        const { error } = await supabase.from("user_information").insert([
+          {
+            // id: uid(),
+            // created_at: new Date(),
+            email: email.value,
+            fullName: fullName.value,
+            licensePlate: licensePlate.value,
+          },
+        ]);
+        if (error) throw error;
+        console.log("Succes: User Added!");
+        setTimeout(() => {
+          statusMsg.value = false;
+        }, 5000);
+      } catch (error) {
+        errorMsg.value = `Error createUser: ${error.message}`;
+        setTimeout(() => {
+          errorMsg.value = false;
+        }, 5000);
+      }
+    };
 
     // Register function
     const register = async () => {
@@ -89,6 +142,7 @@ export default {
             email: email.value,
             password: password.value,
           });
+          createUser();
           if (error) throw error;
           router.push({ name: "Login" });
         } catch (error) {
@@ -105,33 +159,7 @@ export default {
       }, 5000);
     };
 
-    const createUser = async () => {
-      try {
-        const { error } = await supabase.from("profiles").insert([
-          {
-            id: uid(),
-            updated_at: new Date(),
-            email: email.value,
-            password: password.value,
-          },
-        ]);
-        if (error) throw error;
-        statusMsg.value = "Succes: Workout Created!";
-        //workoutName.value = null;
-        //workoutType.value = "select-workout";
-        //exercises.value = [];
-        setTimeout(() => {
-          statusMsg.value = false;
-        }, 5000);
-      } catch (error) {
-        errorMsg.value = `Error: ${error.message}`;
-        setTimeout(() => {
-          errorMsg.value = false;
-        }, 5000);
-      }
-    };
-
-    return { email, password, confirmPassword, errorMsg, register, createUser };
+    return { email, password, confirmPassword, errorMsg, register };
   },
 };
 </script>
