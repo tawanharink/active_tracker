@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { supabase } from "../supabase/init";
 import Home from "../views/Home.vue";
+import Dashboard from "../views/Dashboard.vue";
 import Login from "../views/Login.vue";
 import Register from "../views/Register.vue";
 import Create from "../views/Create.vue";
@@ -14,6 +15,15 @@ const routes = [
     meta: {
       title: "Home",
       auth: false,
+    },
+  },
+  {
+    path: "/dashboard",
+    name: "Dashboard",
+    component: Dashboard,
+    meta: {
+      title: "Dashboard",
+      auth: true,
     },
   },
   {
