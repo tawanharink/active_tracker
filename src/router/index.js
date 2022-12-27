@@ -3,7 +3,6 @@ import { supabase } from "../supabase/init";
 import Home from "../views/Home.vue";
 import Login from "../views/Login.vue";
 import Register from "../views/Register.vue";
-import Information from "../views/Information.vue";
 import Create from "../views/Create.vue";
 import ViewWorkout from "../views/ViewWorkout.vue";
 
@@ -33,15 +32,6 @@ const routes = [
     meta: {
       title: "Register",
       auth: false,
-    },
-  },
-  {
-    path: "/information",
-    name: "Information",
-    component: Information,
-    meta: {
-      title: "Information",
-      auth: true,
     },
   },
   {
