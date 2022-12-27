@@ -7,7 +7,7 @@
 
     <!-- Register -->
     <form
-      @submit.prevent="register"
+      @submit.prevent="getUser"
       class="p-8 flex flex-col bg-light-grey rounded-md shadow-lg"
     >
       <h1 class="text-3xl text-at-light-green mb-4">Register</h1>
@@ -100,28 +100,79 @@ export default {
     const email = ref(null);
     const password = ref(null);
     const confirmPassword = ref(null);
-    const fullName = ref(null);
-    const licensePlate = ref(null);
+    const fullName = ref("");
+    const licensePlate = ref("");
     const errorMsg = ref(null);
     const statusMsg = ref(null);
+    
+    const updateUser = async () => {
+      try {
+        console.log(email.value)
+        console.log(fullName.value)
+        console.log(licensePlate.value)
+        const { data, error } = await supabase
+          .from('user_information')
+          .update({ email: email.value, fullName: fullName.value, licensePlate: licensePlate.value })
+          .eq("email", email.value);
+        console.log(data)
+        if (error) throw error;
+        console.log("Succes: User Updated!");
+        setTimeout(() => {
+          statusMsg.value = false;
+        }, 5000);
+      } catch (error) {
+        errorMsg.value = `Error createUser: ${error.message}`;
+        setTimeout(() => {
+          errorMsg.value = false;
+        }, 5000);
+      }
+    };
 
-    // const test = () => {
-    //   console.log("test")
-    // }
+    const getUser = async () => {
+      try {
+        let { data, error } = await supabase
+          .from('user_information')
+          .select('id, email')
+          .eq('email', email.value) 
+        if (error) throw error;
+        console.log(data.length);
+        if (data.length == 1) {
+          console.log("There is a user with email: " + email.value);
+          errorMsg.value = "Error: There already is an account with this email, please login with your email and password.";
+            setTimeout(() => {
+            errorMsg.value = null;
+          }, 5000);
+          updateUser();
+        } else if (data.length >= 1) {
+          console.log("There are multiple users with the email: " + email.value)
+        } else {
+          console.log("There is no user with email: " + email.value)
+          register();
+        }
+        setTimeout(() => {
+          statusMsg.value = false;
+        }, 5000);
+      } catch (error) {
+        errorMsg.value = `Error getUser: ${error.message}`;
+        setTimeout(() => {
+          errorMsg.value = false;
+        }, 5000);
+      }
+    };
 
     //insert data to users
     const createUser = async () => {
       try {
         const { error } = await supabase.from("user_information").insert([
           {
-            // id: uid(),
-            // created_at: new Date(),
             email: email.value,
             fullName: fullName.value,
             licensePlate: licensePlate.value,
           },
         ]);
         if (error) throw error;
+        console.log(fullName);
+        console.log(licensePlate);
         console.log("Succes: User Added!");
         setTimeout(() => {
           statusMsg.value = false;
@@ -136,12 +187,13 @@ export default {
 
     // Register function
     const register = async () => {
+      getUser();
       if (password.value === confirmPassword.value) {
         try {
           const { error } = await supabase.auth.signUp({
             email: email.value,
             password: password.value,
-          });
+          });   
           createUser();
           if (error) throw error;
           router.push({ name: "Login" });
@@ -159,7 +211,7 @@ export default {
       }, 5000);
     };
 
-    return { email, password, confirmPassword, errorMsg, register };
+    return { email, password, confirmPassword, errorMsg, fullName, licensePlate, getUser };
   },
 };
 </script>
