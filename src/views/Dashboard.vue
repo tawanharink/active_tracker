@@ -1,6 +1,6 @@
 <template>
     <div
-        class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-6"
+        class="grid grid-cols-1 mx-20 my-10 shadow-xl sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-6"
     >
       <GoogleMap :api-key="apiKey" style="width: 100%; height: 500px" :center="{ lat: lat, lng: lng }" :zoom="19">
             <Marker :options="{ position: { lat: 52.039943, lng: 4.328807 }, icon: chargers[0]}" @click="updateCar(0)">
